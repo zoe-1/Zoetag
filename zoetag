@@ -212,10 +212,9 @@ fi
 #   ZOETAG FUNCTIONS
 #
 
-# Get all files.
-PROJECT_FILES=$(find . -type f -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
 
 
+declare -a PROJECT_FILES;  # All project files loaded into this array. 
 declare -a NEW_TAGS_REQUESTS;  # New jump links locations.
 declare -a LAND_RESULTS;  # Landing location.
 													# Landing is most important.
@@ -352,21 +351,34 @@ function __modify_jump_links(){
 
 }
 
+
+function __load_requests(){
+
+	#
+	# Load requests from all files in the project.
+	#
+
+	# Get all files.
+	PROJECT_FILES=$(find . -type f -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
+
+	# Load requests from files 
+	i=0;
+	ci=0;
+	for file in ${PROJECT_FILES[@]}
+	do
+		__process_file
+		
+	done
+
+}
  
 
-# Load requests from files 
-i=0;
-ci=0;
-for file in ${PROJECT_FILES[@]}
-do
-	__process_file
-	
-done
 
 # request to add tags
 if [[ $1 =~ add|--add|-add ]]; # && echo "yes"
 then 
 
+	__load_requests
 	# Clear screem move cursor to 0,0.
 
 	#echo "--------------------------";
@@ -459,6 +471,9 @@ fi
 # request to edit tags
 if [[ $1 =~ edit|--edit|-edit ]]; 
 then 
+
+	__load_requests
+
   change_count=${#CHANGE_REQUESTS[@]}
 	echo "$change_count"
 

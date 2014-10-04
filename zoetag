@@ -1,0 +1,547 @@
+#!/bin/bash
+
+
+#
+# Zoe Tags
+# Link all your help/navigation tags together
+# and remake your ctags file. 
+#
+
+
+#
+# COMMANDS RECEIVED
+#
+if [[ $1 =~ help|--help|-help ]]; # && echo "yes"
+then 
+	red='\e[0;31m'
+	yellow='\e[1;33m'
+	green='\e[0;32m'
+	NC='\e[0m' # No Color_
+	#echo -e "${yellow}$error_message${NC} "
+			help_menu=$( cat << EOF 
+${yellow}Zoe Tag Help Menu
+${green}Description:
+Use zoetag to add and edit your own custom ctags. 
+This will allow you to conveniently make jump link 
+navigation throughout your projects.  
+
+Got tired of manually writing in my own tags to 
+ctags file so made this script. Hope it helps :-] 
+See --howto for more details on how to use,
+plus, read this whole help section.
+
+
+zoetag [options]
+  --help -help help 
+    Displays this help menu.
+
+  -add -add add
+    Add all new tags in your project to tags file.
+
+  --edit -edit edit
+    Change existing tag names. 
+    See --edit_example
+
+  --howto -howto howto
+    Brief description on how to use zoetags.
+
+  --example -example example
+    Detailed example on how to use zoe tags.
+
+  --edit_example -edit_example edit_example
+    Explanation on how to edit tags.
+
+
+${NC}
+EOF
+)	
+	tput clear
+	echo -e "$help_menu"
+
+	# Loop through various color options.
+	# for (( i = 0; i < 17; i++ )); do echo "$(tput setaf $i)This is ($i) $(tput sgr0)"; done
+	exit
+fi
+
+
+if [[ $1 =~ howto|--howto|-howto ]]; 
+then 
+
+	red='\e[0;31m'
+	yellow='\e[1;33m'
+	green='\e[0;32m'
+	NC='\e[0m' # No Color_
+	#echo -e "${yellow}$error_message${NC} "
+			howto=$( cat << EOF 
+${yellow}How zoetag works? 
+${green}
+You must initiate your ctags file in your project root folder
+with the following syntax for zoetag to work properly. 
+The below command makes one tags file for your project.  
+zoetag assumes you have one tag file per project.
+The command:
+ctags --recurse=yes --sort=yes --append=yes
+
+To add a tag write z[new_tag_name]z in the file where 
+the jump link should land.  Then, zoetag will read the z[..]z 
+command and convert it to a tag. 
+
+zoetag makes landing tags have [tag_name] syntax.
+Then, tag_name will be a jump link [tag_name]. You can
+place tag_name in any file in your project, ctrl+] on top of tag_name 
+and ctags will jump to your landing tag.
+After adding new tags to your tags file zoetag refreshes
+your tags with the above ctags command so tags are ordered and 
+keep working properly.   
+
+EXAMPLE: see zoetag --example
+
+${NC}
+EOF
+)	
+	#tput clear
+	echo -e "$howto"
+
+	# Loop through various color options.
+	# for (( i = 0; i < 17; i++ )); do echo "$(tput setaf $i)This is ($i) $(tput sgr0)"; done
+	exit
+fi
+
+if [[ $1 =~ edit_example|--edit_example|-edit_example ]]; 
+then 
+
+	yellow='\e[1;33m'
+	green='\e[0;32m'
+	NC='\e[0m' # No Color_
+	#echo -e "${yellow}$error_message${NC} "
+	edit_example=$( cat << EOF 
+${yellow}How to edit existing tags.${green}
+zc[old_tag_name]zn[new_tag_name]z is the syntax for editing
+an existing tag. zoetag --edit command will read this message and do the 
+following: 
+1. Edit the tag object in the ctags file.
+2. Edit the landing link name from:
+	 zc[old_tag_name]zn[new_tag_name]z to
+	 [new_tag_name]
+3. All jump links in project {old_tag_name}
+	 will be edited to {new_tag_name}.
+	 tag_names without the {...} syntax will be ignored.
+${NC}
+EOF
+)
+
+	echo -e "$edit_example"
+	exit
+fi
+
+if [[ $1 =~ example|--example|-example ]]; 
+then 
+
+	red='\e[0;31m'
+	yellow='\e[1;33m'
+	green='\e[0;32m'
+	NC='\e[0m' # No Color_
+	#echo -e "${yellow}$error_message${NC} "
+			example=$( cat << EOF 
+${yellow}zoetag example${green}
+Step 1: 
+In my_file.h file (or any file / type), add the new tag name
+by typing z[new_tag_name]z in the file.
+
+/********************/
+BEGIN my_file.h       
+
+// z[my_function_list]z
+char * function1(int i, char *name); 
+        .......      
+        function declarations
+        ....... 
+
+END my_file.h       
+/********************/
+
+
+Step 2:
+In the root directory of your project execute 
+the "zoetag add" command .  zoetag will then read every file 
+in your project, locate z[new_tag]z messages, convert the 
+z[new_tag]z to [new_tag], add the tag to your tags
+file, and then refresh your tags file with:
+ctags --recurse=yes --sort=yes --append=yes.
+
+In the step 1 above, z[my_function_list]z would be converted to 
+[my_function_list] and the below tag object would be added to the ctags
+file.
+
+zoetag APPENDED BELOW TAG OBJECT TO: ./tags  
+my_function_list	./my_file.c	/[my_function_list]/
+
+FILE AFTER zoetag add command
+/********************/
+BEGIN my_file.h       
+
+// [my_function_list]  <- zoe_tag made the landing tag.
+char * function1(int i, char *name); 
+        .......      
+        function declarations
+        ....... 
+
+END my_file.h       
+/********************/
+
+Step 3:
+Now, anywhere in your project you can add jump links to 
+[my_function_list] by just adding "my_function_list" to any file 
+in your project. Vim style help file syntax is recommended: {my_function_list}. 
+This {jump_tag} syntax helps you easily locate jump links in your files.
+Plus, this syntax is used by zoetag to modify your tag names too.
+See zoetag --help --edit_tag.  
+
+${NC}
+EOF
+)	
+
+	#tput clear
+	echo -e "$example"
+
+	exit
+
+fi
+
+#
+#   ZOETAG FUNCTIONS
+#
+
+# Get all files.
+PROJECT_FILES=$(find . -type f -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
+
+
+declare -a NEW_TAGS_REQUESTS;  # New jump links locations.
+declare -a LAND_RESULTS;  # Landing location.
+													# Landing is most important.
+													
+function __already_exists(){
+	# re-write this to have tags be checked one
+	# at a time and then immediate be written to file
+	# before the next tag.  This will avoid the user
+	# submitted duplicates at the same time. 
+
+	line=1;
+	while read p; do
+
+		if [[ $p =~ \[$tag_name\] ]]; # && echo "yes"
+		then 
+			test_result=1
+			echo $test_result;
+			return
+		fi
+
+	done < ./tags
+	
+	test_result=0
+	echo $test_result;
+	return 
+}
+
+
+function __error_message(){
+
+	echo "$(tput setaf 1)$(tput setab 7)Error:$(tput sgr 0)"
+	red='\e[0;31m'
+	yellow='\e[1;33m'
+	NC='\e[0m' # No Color_
+	echo -e "${yellow}$error_message${NC} "
+
+}
+
+
+function __valid_tag(){
+
+	# @todo validate the tagname
+	if [[ $tag_name =~ .-|.^|,|:|.\\|./|\+|=|[[:blank:]] ]];
+	then
+		# forbidden chars found not valid.
+		tag_valid=0;
+		#echo "forbidden chars found."
+		#echo "$tag_name $tag_valid"
+
+	fi
+
+}
+
+function __process_file(){
+
+	# echo "function :-)$file"
+	line=1;
+	while read p; do
+  	#echo $p
+  	# search string using regex.
+  	#if [[ $(echo "$p" | grep -E "z\[.*\]z") ]];
+		if [[ $p =~ z\[.*\]z ]]; # && echo "yes"
+		then 
+			# get tag name
+			tag_name=$(sed 's/.*z\[\(.*\)\]z.*/\1/' <<< "$p")
+			# valid 1 or 0
+			tag_valid=1;
+			__valid_tag
+			failed=0
+
+			if [ $tag_valid -eq 0 ] 
+			then
+				#echo "error entered"
+				error_message=$( cat << EOF 
+tag_name: "$tag_name" is not valid.
+A tag_name cannot have any of the following characters: 
+- ^ , : \ / + = or blank spaces.
+One of these was found.
+EOF
+)	
+				__error_message
+				exit
+
+			fi
+			
+			# place data is string
+			#NEW_TAGS_REQUESTS[i]="$file:$line:$p:$tag_name"; #sh split string at end of line
+			NEW_TAGS_REQUESTS[i]="$file:$line:$tag_name"; #sh split string at end of line
+			i=$(( $i + 1 ))
+
+		elif [[ $p =~ zc\[.*\]zn ]]; 
+		then
+
+			if [[ ! $p =~ zn\[.*\]z ]];
+			then
+				# Check if end of command ]z is set correctly.
+				# Previously, ]c would pass but it would be a mess.
+				echo "Not valid edit command.";
+				exit
+			fi
+
+
+			#tag_name=$(sed 's/.*zc\[\(.*\)\]z.*/\1/' <<< "$p")
+			tag_name=$(sed 's/.*zc\[\(.*\)\]zn.*/\1/' <<< "$p")
+			new_name=$(sed 's/.*zn\[\(.*\)\]z.*/\1/' <<< "$p")
+			CHANGE_REQUESTS[ci]="$file:$line:$tag_name:$new_name"; 
+			ci=$(( $ci + 1 ))
+
+
+		fi
+
+		# increment line number of file being read.
+		line=$(($line +1))
+
+	done <$file
+
+}
+
+
+function __modify_jump_links(){
+
+	#
+	# Go through each file and edit target jump link.
+	#
+	for file in ${PROJECT_FILES[@]}
+	do
+		
+		echo "sed process file edit tags $file"
+		sed "s/{$tag_name}/{$new_tag_name}/g" < $file > ./sed_output;
+		cat ./sed_output > $file;
+		#cat ./sed_output;
+		rm ./sed_output
+	done
+
+}
+
+ 
+
+# Load requests from files 
+i=0;
+ci=0;
+for file in ${PROJECT_FILES[@]}
+do
+	__process_file
+	
+done
+
+# request to add tags
+if [[ $1 =~ add|--add|-add ]]; # && echo "yes"
+then 
+
+	# Clear screem move cursor to 0,0.
+
+	#echo "--------------------------";
+	# echo "$i matches found.";
+	#echo "0 ${NEW_TAGS_REQUESTS[0]}"
+	#echo "1 ${NEW_TAGS_REQUESTS[1]}" 
+	#echo "1 ${NEW_TAGS_REQUESTS[2]}" 
+
+
+	#echo "--------------";
+	#echo "New Tags";
+	#echo "--------------";
+	new_count=${#NEW_TAGS_REQUESTS[@]}
+	#echo $new_count
+	#echo $change_count
+	if [ $new_count -eq 0 ];
+	then
+		echo "no changes to make."
+		exit
+	fi
+	tput clear
+	#echo "$count new tags."
+	i=0
+	for record in "${NEW_TAGS_REQUESTS[@]}"
+	do
+
+		tag_name=$(echo $record | awk -F: ' { print $3 } ');
+		file=$(echo $record | awk -F: ' { print $1 } ');
+
+		# Ensure tag does not already exist in tags file.
+		# File will exit if current tag exists.
+		# @param $tag_name
+		exists=$(__already_exists)
+		if [ "$exists" -eq 1 ]
+		then
+
+			# found duplicate quit script.
+			error_message=$( cat << EOF 
+Tag already exists in tags file.
+tag_name: "$tag_name" file: $file 
+Cannot create duplicate tag_names in tags file.
+EOF
+)	
+			__error_message
+			exit
+		fi
+
+		#echo $record | awk -F: ' { print $1 } ';
+		#echo "$record";
+		# echo $i; 
+		#echo $record | awk -F: ' { print "1:file: " $1 } ';
+		#echo $record | awk -F: ' { print "2:line: "$2 } ';
+		#echo $record | awk -F: ' { print "3:target: "$3 } ';
+		#echo $record | awk -F: ' { print "4:tag_name: "$4 } ';
+
+
+		#echo $i;
+		i=$(( $i + 1 ))
+
+
+
+		# Append new tag to end of ctags file.
+		# comment ;" at end of line for searchability of zoetags.
+		echo -e "$tag_name\t$file\t/[$tag_name]/;\"zoetag" >> ./tags
+
+		# Change the tag to appropriate tag value.
+		#tag_name=$(sed 's/.*z\[\(.*\)\]z.*/\1/' <<< "$p")
+		sed "s/\(.*\)\(z\[\)\(.*\)\(\]z\)\(.*\)/\1[$tag_name]\5/" < $file > ./sed_output;
+		cat ./sed_output > $file;
+		rm ./sed_output
+		
+		ctags --recurse=yes --sort=yes --append=yes
+
+		echo "added tag: $tag_name"
+
+	done
+
+	#
+	# NEW TAGS REQUESTS RECEIVED 
+	# Add tags to tags file.
+
+		
+
+
+	exit
+
+	# END of add --add -add
+fi
+
+# request to edit tags
+if [[ $1 =~ edit|--edit|-edit ]]; 
+then 
+  change_count=${#CHANGE_REQUESTS[@]}
+	echo "$change_count"
+
+	#echo "--------------";
+	#echo "Change Request Results";
+	#echo "--------------";
+	i=0
+
+	if [ ! ${#CHANGE_REQUESTS[@]} -eq 0 ]
+	then
+		#echo "Requests to Edit Tags"
+		for record in "${CHANGE_REQUESTS[@]}"
+		do
+			#echo $record | awk -F: ' { print $1 } ';
+			#echo "$record";
+			# echo $i; 
+
+			#CHANGE_REQUESTS[ci]="$file:$line:$tag_name:$new_name"; 
+			tag_name=$(echo $record | awk -F: ' { print $3 } ';)
+			new_tag_name=$(echo $record | awk -F: ' { print $4 } ';) 
+			file=$(echo $record | awk -F: ' { print $1 } ';);
+			echo $record | awk -F: ' { print "1:file: " $1 } ';
+			echo $record | awk -F: ' { print "2:line: "$2 } ';
+			echo $record | awk -F: ' { print "3:tag_name: "$3 } ';
+			echo $record | awk -F: ' { print "4:new_name: "$4 } ';
+			#echo $i;
+			i=$(( $i + 1 ))
+
+			#
+			# Ensure the tag exists in tags file.
+			# @param tag_name 
+			exists=$(__already_exists)
+			if [ "$exists" -eq 0 ]
+			then
+				# found duplicate quit script.
+				error_message=$( cat << EOF 
+The tag does not exist in tags file.
+tag_name: "$tag_name" file: $file 
+Cannot edit a tag_name that does not exist.
+EOF
+)	
+				__error_message
+				exit
+			fi
+
+			#
+			# Modify tags file and landing tag file.
+			#
+			echo "OK tag name: $tag_name is in tags file: $file"
+			echo "NEW TAGNAME: $new_tag_name "
+
+			sed "s/$tag_name/$new_tag_name/g" < ./tags > ./sed_output;
+			cat ./sed_output > ./tags;
+			rm ./sed_output
+
+
+			#tag_name=$(sed 's/.*zc\[\(.*\)\]zn.*/\1/' <<< "$p")
+			#tag_target=$(sed 's/.*zc\[\(.*\)\]z.*/\1/' < $file)
+			# tag_target=$(sed "s/\(^.*\)\(zc\[\)\(.*\)\(\]z\)\(.*\)/\1[$new_tag_name]\5/" < $file)
+			sed "s/\(^.*\)\(zc\[\)\(.*\)\(\]z\)\(.*\)/\1[$new_tag_name]\5/" < $file > ./sed_output2;
+			cat ./sed_output2 > $file; 
+			rm ./sed_output2
+
+
+			#
+			# Modify all jump links in project.
+			#
+			__modify_jump_links
+
+			#
+			# Refresh tags file.
+			#
+			ctags --recurse=yes --sort=yes --append=yes
+
+			echo "Edited tag: $tag_name to $new_tag_name"
+
+
+		done
+	fi
+
+	exit
+fi
+
+
+
+echo "zoetags 2014 version 0.0.1"

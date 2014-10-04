@@ -1,0 +1,13 @@
+zoetag script
+
+Use zoetag to add and edit your own custom ctags. 
+This will allow you to conveniently make jump link 
+navigation throughout your projects.  
+
+For details on how to use zoetag:
+zoetag --help 
+
+Enjoy :-)
+Jon Swenson
+10/4/2014
+

@@ -1,0 +1,174 @@
+/**********************************
+					zoetags CONTENTS 					{CONTENTS}
+***********************************/
+
+
+
+TODOS
+	1. make refresh ctags command.
+	zoetag refresh
+	2. make init command. 
+	zoetag init
+	This creates the project planning structure below. 
+
+
+
+THOUGHTS ABOUT PROJECT STRUCTURE
+Every project is going to have similar issues to think through.
+Developing requirements, planning your time, designing and implementing your code logic, 
+testing the code written, and reflecting on what your are doing.
+There are requirements, todos, classes, diagrams relating to 
+classes, cucumbers -- writing out function logic, tests of the code created, 
+brainstorming -- thinking through issues of your project, and reflecting about your project. 
+journal records recording your thoughts throughout the development process.
+Design versus Implementation.
+
+1. Contents Page
+	 Links to: 
+		Classes Index
+	 	todos
+	 	requirements 
+		project_journal
+		testing index
+	Git Branches
+
+
+1. requirements
+		The requirements section is where project terms are
+		flush out. Requirements describe what is needed from the application.
+		Who are the users? What do they require from the 
+		application? What ways will they interact with the
+		software? What vocubularly are you going to use to talk about
+		the project.... 
+		init:
+		./docs/requirements/requirements_index.txt
+		Action:
+		add_requirments_file
+		 - Ask for name of the file.
+			 Recieve name and then create the file:  
+			 ./requirments/new_filename.txt.
+		 - Add jump link from requirements_index.txt
+			 to new_filename.txt
+2. todos
+		./docs/todos/todos_index.txt
+	  ./docs/todos/todos_new_filename.txt
+		init:
+		./docs/todos/todos_index.txt
+		Action:
+		add_todos_file
+		 - Ask for name of new todos file.
+			 Receive name and then create the file:
+			 ./docs/todos/todos_new_filename.txt
+3. project_journal
+		Periodically, record what you are doing and 
+		thinking about regarding the project. Ideally, end every 
+		programming session by recording what your 
+		are thinking about the project. Plus, put the git commit
+		id for the commit you ended the coding session with.  
+		init:
+		./docs/journal/journal_index.txt
+		./docs/journal/project_journal.txt
+4. classes
+		Every project is going to have a class index file.
+		Here all classes or structs are listed.  Class functions/methods 
+		have cucumber files describing the logic of the function 
+	  in a human readable format.	This is similar to a 
+		sequence diagram in UML which are very helpful for solving complex issues. 
+		Summary of classes components:
+		1. ./docs/classes/classes_index.txt 									--  Classes index file. 
+		2. ./docs/classes/diagrams/ 													--  Classes diagrams directory 
+		3. ./docs/classes/class/															--  A class directory
+		4. ./docs/classes/class/class_index.txt 							--  Class index file. 
+		5. ./docs/classes/class/cucumbers/										--  Class cucumber directory
+		6. ./docs/classes/class/cucumbers/cucumber_name.txt   --  Class cucumber file 
+		7. implemention file located in project.
+		init:
+		./docs/classes/classes_index.txt
+			List all classes in project here. 
+			Jump links to their files.
+			Here I like to make links to: 
+			1. the function list of the class in the .h file.
+			2. the struct of the class.
+			3. the class index page where links 
+				 to all cucumbers for the class are located.
+				 I find myself refering to the class index
+				 as the cucumbers page for the class.
+			In summary, in one glance I can see all classes
+			for the project and have jump links to all important 
+			aspects of the class (struct, implementation, function list, cucumbers).
+		./docs/classes/diagrams/uml_docs_here
+			If developing a complex schema etc. can 
+			make uml diagrams and put them here. 
+		./docs/classes/class/class_index.txt
+			This is similar to an index file for a class.
+			If Ruby project etc. there is no interface file for
+			classes, so make a text interface file to describe it.
+			If C project, interface is .h file. 
+			Obj-C .i?? .m
+		./docs/classes/class/cucumbers/cucumber_name.txt
+			A cucumber flushes out the logic of a 
+			function or method in human readable format.  
+			It is a simple human language version of the
+		 	the logic used in a function.
+			--thought: When making cucumbers for interface functions
+			there will be links to cucumbers in other classes forming something
+			like a sequence diagram.  If needed each function could have it's own 
+			cucumber. This will create clearly written out code logic 
+			describing parameters and return values of functions.  
+		./project/class_implementation.program_extension
+			The implementation file is where the actual
+			code for the class is located.
+		actions:
+			- add class file to index.
+				Add directory and file to classes:
+				./docs/classes/class_name/class_index.txt
+			- add cucumber file to class.
+				Write out logic for a function in it's cucumber file.
+
+5. Testing Index
+		./docs/testing/
+		./docs/testing/testing_index.txt
+		./docs/testing/tests_class_name/test_class_name.txt
+		actions:
+			-add new class to test.
+			zoetag --add_test  --class_name=class_name
+			
+
+./docs structure
+	.Contents.txt
+	---------------------------------------
+	./docs/requirements/requirements_index.txt
+	./docs/requirements/requirements_file.txt
+	---------------------------------------
+	./docs/todos/todos_index.txt
+	./docs/todos/todos_new_filename.txt
+	---------------------------------------
+	./docs/journal/journal_index.txt
+	./docs/journal/project_journal.txt
+	---------------------------------------
+	./docs/classes/classes_index.txt 									 --  Classes index file. 
+	./docs/classes/diagrams/ 													 --  Classes diagrams directory 
+	./docs/classes/class/															 --  A class directory
+	./docs/classes/class/class_index.txt 						 	 --  Class index file. 
+	./docs/classes/class/pseudo_code/										 --  Class cucumber directory
+	./docs/classes/class/pseudo_code/function_name.txt   --  Pseudo code for a function. 
+	implemention file located in project.
+	---------------------------------------
+	./docs/testing/																				-- Put testing code in with functions etc.
+	./docs/testing/testing_index.txt
+	./docs/testing/tests_class_name/test_class_name.txt
+	---------------------------------------
+	./docs/scripts/script_index.txt										 --	Scripts described here.
+	./docs/scripts/script_name.txt										 --	Scripts described here.
+	./docs/scripts/pseudo_code/script_name.txt		 --	Pseudo Code flushing out logic of functions.
+	./docs/scripts/tests/test_name.txt		 						 --	Description of test for functions.
+	./docs/function_groups/functions_script_name.txt				 --	Functions in scripts described here.
+																												similar to scripts. function group here.
+	---------------------------------------
+	./docs/libraries/library_name/ 											-- Library Name for go style code.
+	./docs/libraries/library_name/name_index.txt
+	./docs/libraries/library_name/pseudo_code/					-- library functions. 
+
+	
+	./docs/schemas/
+	./docs/developer_scripts/scripts_for_maintaining_project.sh

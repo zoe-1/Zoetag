@@ -35,6 +35,10 @@ zoetag [options]
   --help -help help 
     Displays this help menu.
 
+  -init --init init
+		Initiates ctags project in current directory.
+		ctags --recurse=yes --sort=no --append=yes
+
   -add -add add
     Add all new tags in your project to tags file.
 
@@ -75,12 +79,16 @@ then
 			howto=$( cat << EOF 
 ${yellow}How zoetag works? 
 ${green}
-You must initiate your ctags file in your project root folder
+zoetag init
+To initiate ctags in your project.
+Exectues: ctags --recurse=yes --sort=no --append=yes
+
+Or, you must initiate your ctags file in your project root folder
 with the following syntax for zoetag to work properly. 
 The below command makes one tags file for your project.  
 zoetag assumes you have one tag file per project.
 The command:
-ctags --recurse=yes --sort=yes --append=yes
+ctags --recurse=yes --sort=no --append=yes
 
 To add a tag write z[new_tag_name]z in the file where 
 the jump link should land.  Then, zoetag will read the z[..]z 
@@ -90,6 +98,8 @@ zoetag makes landing tags have [tag_name] syntax.
 Then, tag_name will be a jump link [tag_name]. You can
 place tag_name in any file in your project, ctrl+] on top of tag_name 
 and ctags will jump to your landing tag.
+-- @todo edit this. 
+-- zoetag no longer refreshes tags file but uses unsorted file instead.
 After adding new tags to your tags file zoetag refreshes
 your tags with the above ctags command so tags are ordered and 
 keep working properly.   
@@ -167,7 +177,9 @@ the "zoetag add" command .  zoetag will then read every file
 in your project, locate z[new_tag]z messages, convert the 
 z[new_tag]z to [new_tag], add the tag to your tags
 file, and then refresh your tags file with:
-ctags --recurse=yes --sort=yes --append=yes.
+ctags --recurse=yes --sort=no --append=yes.
+Note: currently we d/n refresh tags b/c init makes unsorted.
+above command d/n sort existing custom tags.
 
 In the step 1 above, z[my_function_list]z would be converted to 
 [my_function_list] and the below tag object would be added to the ctags
@@ -446,12 +458,13 @@ EOF
 
 		# Change the tag to appropriate tag value.
 		#tag_name=$(sed 's/.*z\[\(.*\)\]z.*/\1/' <<< "$p")
-		sed "s/\(.*\)\(z\[\)\(.*\)\(\]z\)\(.*\)/\1[$tag_name]\5/" < $file > ./sed_output;
+		# bug changes all tags if multiple sed "s/\(.*\)\(z\[\)\(.*\)\(\]z\)\(.*\)/\1[$tag_name]\5/" < $file > ./sed_output;
+		sed "s/\(.*\)\(z\[$tag_name\]z\)\(.*\)/\1[$tag_name]\3/" < $file > ./sed_output;
 		cat ./sed_output > $file;
 		rm ./sed_output
 		
-		ctags --recurse=yes --sort=yes --append=yes
-
+		# ctags  --recurse=yes -e --sort=yes --append=yes
+		# ctags --recurse=yes --sort=yes --append=yes
 		echo "added tag: $tag_name"
 
 	done
@@ -459,7 +472,6 @@ EOF
 	#
 	# NEW TAGS REQUESTS RECEIVED 
 	# Add tags to tags file.
-
 		
 
 
@@ -546,7 +558,7 @@ EOF
 			#
 			# Refresh tags file.
 			#
-			ctags --recurse=yes --sort=yes --append=yes
+			#ctags --recurse=yes --sort=no --append=yes
 
 			echo "Edited tag: $tag_name to $new_tag_name"
 
@@ -557,6 +569,12 @@ EOF
 	exit
 fi
 
+# request to add tags
+if [[ $1 =~ init|--init|-init ]]; # && echo "yes"
+then 
+	ctags --recurse=yes --sort=no --append=yes
+	echo "inititiates ctags"
+	exit
+fi
 
-
-echo "zoetags 2014 version 0.0.1"
+echo "zoetag 2014 version 0.0.1"

@@ -371,8 +371,10 @@ function __load_requests(){
 	#
 
 	# Get all files.
-	PROJECT_FILES=$(find . -type f -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
+	#PROJECT_FILES=$(find .  -type f -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
 
+	# ignore: node_modules
+	PROJECT_FILES=$(find . ! -path "*/node_modules/*" -type f  -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
 	# Load requests from files 
 	i=0;
 	ci=0;
@@ -392,6 +394,7 @@ then
 
 	__load_requests
 	# Clear screem move cursor to 0,0.
+	echo "loaded"
 
 	#echo "--------------------------";
 	# echo "$i matches found.";
@@ -572,7 +575,7 @@ fi
 # request to add tags
 if [[ $1 =~ init|--init|-init ]]; # && echo "yes"
 then 
-	ctags --recurse=yes --sort=no --append=yes
+	ctags --recurse=yes --sort=no --append=yes --exclude=node_modules
 	echo "inititiates ctags"
 	exit
 fi

@@ -11,3 +11,5 @@ Enjoy :-)
 Jon Swenson
 10/4/2014
 
+MAC needs ctags-exuberant
+	brew install ctags-exuberant

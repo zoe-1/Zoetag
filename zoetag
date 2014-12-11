@@ -282,66 +282,73 @@ function __valid_tag(){
 
 function __process_file(){
 
+  # test if file is directory if yes exit.
 	# echo "function :-)$file"
-	line=1;
-	while read p; do
-  	#echo $p
-  	# search string using regex.
-  	#if [[ $(echo "$p" | grep -E "z\[.*\]z") ]];
-		if [[ $p =~ z\[.*\]z ]]; # && echo "yes"
-		then 
-			# get tag name
-			tag_name=$(sed 's/.*z\[\(.*\)\]z.*/\1/' <<< "$p")
-			# valid 1 or 0
-			tag_valid=1;
-			__valid_tag
-			failed=0
+	if [ ! -d $file ]; then
+	  # If not a directory then process the file. 
 
-			if [ $tag_valid -eq 0 ] 
-			then
-				#echo "error entered"
-				error_message=$( cat << EOF 
+		line=1;
+		while read p; do
+			#echo $p
+			# search string using regex.
+			#if [[ $(echo "$p" | grep -E "z\[.*\]z") ]];
+			if [[ $p =~ z\[.*\]z ]]; # && echo "yes"
+			then 
+				# get tag name
+				tag_name=$(sed 's/.*z\[\(.*\)\]z.*/\1/' <<< "$p")
+				# valid 1 or 0
+				tag_valid=1;
+				__valid_tag
+				failed=0
+
+				if [ $tag_valid -eq 0 ] 
+				then
+					#echo "error entered"
+					error_message=$( cat << EOF 
 tag_name: "$tag_name" is not valid.
 A tag_name cannot have any of the following characters: 
 - ^ , : \ / + = or blank spaces.
 One of these was found.
 EOF
 )	
-				__error_message
-				exit
+					__error_message
+					exit
 
-			fi
-			
-			# place data is string
-			#NEW_TAGS_REQUESTS[i]="$file:$line:$p:$tag_name"; #sh split string at end of line
-			NEW_TAGS_REQUESTS[i]="$file:$line:$tag_name"; #sh split string at end of line
-			i=$(( $i + 1 ))
+				fi
+				
+				# place data is string
+				#NEW_TAGS_REQUESTS[i]="$file:$line:$p:$tag_name"; #sh split string at end of line
+				NEW_TAGS_REQUESTS[i]="$file:$line:$tag_name"; #sh split string at end of line
+				i=$(( $i + 1 ))
 
-		elif [[ $p =~ zc\[.*\]zn ]]; 
-		then
-
-			if [[ ! $p =~ zn\[.*\]z ]];
+			elif [[ $p =~ zc\[.*\]zn ]]; 
 			then
-				# Check if end of command ]z is set correctly.
-				# Previously, ]c would pass but it would be a mess.
-				echo "Not valid edit command.";
-				exit
+
+				if [[ ! $p =~ zn\[.*\]z ]];
+				then
+					# Check if end of command ]z is set correctly.
+					# Previously, ]c would pass but it would be a mess.
+					echo "Not valid edit command.";
+					exit
+				fi
+
+
+				#tag_name=$(sed 's/.*zc\[\(.*\)\]z.*/\1/' <<< "$p")
+				tag_name=$(sed 's/.*zc\[\(.*\)\]zn.*/\1/' <<< "$p")
+				new_name=$(sed 's/.*zn\[\(.*\)\]z.*/\1/' <<< "$p")
+				CHANGE_REQUESTS[ci]="$file:$line:$tag_name:$new_name"; 
+				ci=$(( $ci + 1 ))
+
+
 			fi
 
+			# increment line number of file being read.
+			line=$(($line +1))
 
-			#tag_name=$(sed 's/.*zc\[\(.*\)\]z.*/\1/' <<< "$p")
-			tag_name=$(sed 's/.*zc\[\(.*\)\]zn.*/\1/' <<< "$p")
-			new_name=$(sed 's/.*zn\[\(.*\)\]z.*/\1/' <<< "$p")
-			CHANGE_REQUESTS[ci]="$file:$line:$tag_name:$new_name"; 
-			ci=$(( $ci + 1 ))
+		done <$file
+	fi
 
 
-		fi
-
-		# increment line number of file being read.
-		line=$(($line +1))
-
-	done <$file
 
 }
 
@@ -351,15 +358,22 @@ function __modify_jump_links(){
 	#
 	# Go through each file and edit target jump link.
 	#
-	for file in ${PROJECT_FILES[@]}
-	do
-		
-		echo "sed process file edit tags $file"
-		sed "s/{$tag_name}/{$new_tag_name}/g" < $file > ./sed_output;
-		cat ./sed_output > $file;
-		#cat ./sed_output;
-		rm ./sed_output
-	done
+		for file in ${PROJECT_FILES[@]}
+		do
+
+			if [ ! -d $file ]; then
+				# ensure file is not a directory.
+
+				#echo "sed process file edit tags $file"
+				sed "s/{$tag_name}/{$new_tag_name}/g" < $file > ./sed_output;
+				cat ./sed_output > $file;
+				#cat ./sed_output;
+				rm ./sed_output
+
+			fi
+			
+		done
+
 
 }
 
@@ -374,8 +388,29 @@ function __load_requests(){
 	#PROJECT_FILES=$(find .  -type f -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
 
 	# ignore: node_modules
-	PROJECT_FILES=$(find . ! -path "*/node_modules/*" -type f  -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
+	# PROJECT_FILES=$(find . ! -path "*/node_modules/*" -type f  -name "*" -not -name ".*" -and -not -name "tags"  -and -not -name "*.bkup" -and -not -name "zoetag" -and -not -name ".gitignore", -and -not -path '*/\.*' );
 	# Load requests from files 
+	#find . -path ./node_modules -prune -o  \
+#				 -path ./.git -prune -o \
+# 				 -path ./public/bower_components -prune -o \
+#	 -print > .ctags_index
+	#PROJECT_FILES=$(find . ! -type f -name "*" -not -name "tags" \
+# #												 -and \
+#												 -path ./node_modules -prune -o \
+#												 -path ./.git -prune -o \
+#												 -path ./public/bower_components -prune -o\
+#												 -print
+#												 );
+
+	PROJECT_FILES=$(find . -path ./node_modules -prune -o \
+												 -path ./.git -prune -o \
+												 -path ./public/bower_components -prune -o\
+												 -type f  \
+												 -not -name "tags"\
+												 -and -not -name "zoetag"\
+												 -and -not -name ".git"\
+												 );
+
 	i=0;
 	ci=0;
 	for file in ${PROJECT_FILES[@]}
@@ -490,7 +525,7 @@ then
 	__load_requests
 
   change_count=${#CHANGE_REQUESTS[@]}
-	echo "$change_count"
+	#echo "$change_count"
 
 	#echo "--------------";
 	#echo "Change Request Results";
@@ -510,10 +545,10 @@ then
 			tag_name=$(echo $record | awk -F: ' { print $3 } ';)
 			new_tag_name=$(echo $record | awk -F: ' { print $4 } ';) 
 			file=$(echo $record | awk -F: ' { print $1 } ';);
-			echo $record | awk -F: ' { print "1:file: " $1 } ';
-			echo $record | awk -F: ' { print "2:line: "$2 } ';
-			echo $record | awk -F: ' { print "3:tag_name: "$3 } ';
-			echo $record | awk -F: ' { print "4:new_name: "$4 } ';
+			#echo $record | awk -F: ' { print "1:file: " $1 } ';
+			#echo $record | awk -F: ' { print "2:line: "$2 } ';
+			#echo $record | awk -F: ' { print "3:tag_name: "$3 } ';
+			#echo $record | awk -F: ' { print "4:new_name: "$4 } ';
 			#echo $i;
 			i=$(( $i + 1 ))
 
@@ -537,7 +572,7 @@ EOF
 			#
 			# Modify tags file and landing tag file.
 			#
-			echo "OK tag name: $tag_name is in tags file: $file"
+			#echo "OK tag name: $tag_name is in tags file: $file"
 			echo "NEW TAGNAME: $new_tag_name "
 
 			sed "s/$tag_name/$new_tag_name/g" < ./tags > ./sed_output;
@@ -575,8 +610,19 @@ fi
 # request to add tags
 if [[ $1 =~ init|--init|-init ]]; # && echo "yes"
 then 
-	ctags --recurse=yes --sort=no --append=yes --exclude=node_modules
-	echo "inititiates ctags"
+	# ctags --recurse=yes --sort=no --append=yes --exclude=node_modules
+
+	# Make index file of all paths you want to track.
+	# First prune directories you do not want to track.
+	find . -path ./node_modules -prune -o  \
+				 -path ./.git -prune -o \
+				 -path ./public/bower_components -prune -o \
+				 -print > .ctags_index
+
+	#ctags --recurse=yes --sort=no --append=yes -L ./.ctags_index
+	ctags -L ./.ctags_index --sort=no --append=yes 
+
+	echo "inititiated ctags"
 	exit
 fi
 

@@ -7,9 +7,10 @@
 TODOS
 	1. make refresh ctags command.
 	zoetag refresh
-	2. make init command. 
+	XX2. make init command. 
 	zoetag init
 	This creates the project planning structure below. 
+	3. Make contents file and tag when project inits.
 
 
 

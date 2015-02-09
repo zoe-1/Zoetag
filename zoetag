@@ -405,6 +405,8 @@ function __load_requests(){
 	PROJECT_FILES=$(find . -path ./node_modules -prune -o \
 												 -path ./.git -prune -o \
 												 -path ./public/bower_components -prune -o\
+												 -not -path "*node_modules*" \
+												 -not -path "*angular*" \
 												 -type f  \
 												 -not -name "tags"\
 												 -and -not -name "zoetag"\
@@ -617,6 +619,8 @@ then
 	find . -path ./node_modules -prune -o  \
 				 -path ./.git -prune -o \
 				 -path ./public/bower_components -prune -o \
+				 -not -path "*node_modules*" \
+				 -not -path "*angular*" \
 				 -print > .ctags_index
 
 	#ctags --recurse=yes --sort=no --append=yes -L ./.ctags_index
